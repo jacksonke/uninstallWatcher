@@ -1,2 +1,2 @@
 # uninstallWatcher
-detect the uninstall event of android app
+Detect the uninstall event of android application, then popup a browser.
