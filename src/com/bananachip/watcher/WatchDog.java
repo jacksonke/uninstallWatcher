@@ -10,7 +10,13 @@ public class WatchDog {
 	public static final String TAG=WatchDog.class.getSimpleName();
 	
 	static{
-		System.loadLibrary("util");
+		try {
+			System.loadLibrary("util");
+		} catch (Throwable  e) {
+			Log.e(TAG, "failed to load library");
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static native int init2(String packageName, String watchDogName, String userSerial, String url);

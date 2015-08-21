@@ -11,9 +11,6 @@
 #include <sys/inotify.h>
 #include <sys/stat.h>
 
-//#include <android/log.h>
-
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -135,7 +132,6 @@ int startWatch()
 	}
 
 	kesyPrintf("start observe\n");
-
 	
 	while(1)
 	{
