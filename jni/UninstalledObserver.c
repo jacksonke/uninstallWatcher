@@ -50,6 +50,30 @@ static int checkSingletonV2(const char* dogName)
 	}
 }
 
+// convert jstring to local C-style string
+// myJString: 	jstring to convert
+// szLocal: 		store the converted c-style string
+// szFailedMsg: log msg when it's failed to convert
+// return value: 0 when failed, 1 when success
+static int convertJString2LocalString(JNIEnv *env, jstring myJString, char* szLocal, char* szFailedLog)
+{
+	const jbyte* str;
+	str = (*env)->GetStringUTFChars(env, myJString, NULL);
+
+	if (0 != str) {
+		strcpy(szLocal, str);
+		(*env)->ReleaseStringUTFChars(env, myJString, str);
+		return 1;
+	}
+	else{
+		if (szFailedLog != NULL){
+			kesyPrintf("%s", szFailedLog);
+		}
+
+		return 0;
+	}
+}
+
 // packageName : the package name who call this jni function
 // watchDogName 这个是监控程序的so文件名。这个判断有没有监控进程存在的依据
 // userSerial 这个参数在弹出网页需要用到，4.2以上的版本用到，4.2的为NULL
@@ -62,67 +86,43 @@ JNIEXPORT int JNICALL Java_com_bananachip_watcher_WatchDog_init2(JNIEnv *env, jo
 	char szWatchDogName[NAME_MAX]="\0";
 	char szSerial[NAME_MAX]="\0";
 	
+	int retConvert  = 0;
+
 	kesyPrintf("NAME_MAX=%d\n", NAME_MAX);
 	
-	// 只是简单较错
 	if (NULL == packageName){
-		kesyPrintf("packageName null\n");
+		kesyPrintf("packageName is null\n");
 		return -1;
 	}
 	
 	if (NULL == watchDogName){
-		kesyPrintf("watchDogName null\n");
+		kesyPrintf("watchDogName is null\n");
 		return -1;
 	}
 	
-	// convert to c-style string
-	const jbyte* str;
-	str = (*env)->GetStringUTFChars(env, packageName, NULL);
-	if (0 != str) {
-		strcpy(szPackageName, str);
-		(*env)->ReleaseStringUTFChars(env, packageName, str);
-	}
-	else{
-		kesyPrintf("failed to convert to C string[packageName]\n");
+
+	if (convertJString2LocalString(env, packageName, szPackageName, "failed to convert to C string[packageName]\n") == 0){
 		return -1;
 	}
 	
-	str = (*env)->GetStringUTFChars(env, watchDogName, NULL);
-	if (0 != str) {
-		strcpy(szWatchDogName, str);
-		(*env)->ReleaseStringUTFChars(env, watchDogName, str);
-	}
-	else{
-		kesyPrintf("failed to convert to C string[watchDogName]\n");
+	if (convertJString2LocalString(env, watchDogName, szWatchDogName, "failed to convert to C string[watchDogName]\n") == 0){
 		return -1;
 	}
 	
 	if (userSerial != NULL){
-		str = (*env)->GetStringUTFChars(env, userSerial, NULL);
-		if (0 != str) {
-			strcpy(szSerial, str);
-			(*env)->ReleaseStringUTFChars(env, userSerial, str);
-		}
-		else{
-			kesyPrintf("failed to convert to C string[userSerial]\n");
+		if (convertJString2LocalString(env, userSerial, szSerial, "failed to convert to C string[userSerial]\n") == 0){
 			return -1;
 		}
 	}
 	
 	if (url != NULL){
-		str = (*env)->GetStringUTFChars(env, url, NULL);
-		if (0 != str) {
-			strcpy(szUrl, str);
-			(*env)->ReleaseStringUTFChars(env, url, str);
-		}
-		else{
-			kesyPrintf("failed to convert to C string[url]\n");
+		if (convertJString2LocalString(env, url, szUrl, "failed to convert to C string[url]\n") == 0){
 			return -1;
 		}
 	}
 	
 	if (checkSingletonV2(szWatchDogName) == 1){
-		kesyPrintf("watch dog is existe\n");
+		kesyPrintf("watch dog is existent\n");
 		return 0;
 	}
 
@@ -130,27 +130,21 @@ JNIEXPORT int JNICALL Java_com_bananachip_watcher_WatchDog_init2(JNIEnv *env, jo
     pid_t pid = fork();
     if (pid < 0)
     {
-		kesyPrintf("fork failed");
-        exit(1);
+		kesyPrintf("fork failed, errno=%d\n", errno);
     }
     else if (pid == 0)
     {
 		char szSoPath[256]="\0";
 		sprintf(szSoPath, "/data/data/%s/lib/%s", szPackageName, szWatchDogName);
-        if (strlen(szSerial) == 0)
-        {
-			kesyPrintf("111111111111111\n");
+        if (strlen(szSerial) == 0) {
 			execlp(szSoPath, szWatchDogName, "-p", szPackageName, "-u", szUrl, (char *)NULL);
-			
 			exit(1);
         }
-        else
-        {
-			kesyPrintf("2222222222222\n");
+        else {
 			execlp(szSoPath, szWatchDogName, "-p", szPackageName, "-s", szSerial, "-u", szUrl, (char *)NULL);
         }
 		
-		kesyPrintf("exec AM command failed !!! errno=%d\n", errno);
+		kesyPrintf("exec command failed !!! errno=%d\n", errno);
 
     }
     else
