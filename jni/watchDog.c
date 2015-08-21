@@ -116,8 +116,8 @@ int startWatch()
 {
 	kesyPrintf("observed by child process\n");
 	
-	kesyPrintf("EVENT_SIZE=%d", EVENT_SIZE);
-	kesyPrintf("EVENT_BUF_LEN=%d", EVENT_BUF_LEN);
+	/*kesyPrintf("EVENT_SIZE=%d", EVENT_SIZE);
+	kesyPrintf("EVENT_BUF_LEN=%d", EVENT_BUF_LEN);*/
 
 	if (p_buf != NULL){
 		free(p_buf);
@@ -161,7 +161,6 @@ int startWatch()
 				popupBrowser();
 			}
 			
-			
 			printerr();
 			exit(1);
 		}
@@ -188,7 +187,7 @@ int startWatch()
 					exit(1);
 				}
 				else{
-					kesyPrintf("[%d]test if app is uninstalled-------------exist", n);
+					kesyPrintf("[test %d] app is uninstalled-------------no", n);
 				}
 
 				++n;
@@ -263,7 +262,6 @@ int startWatch()
 					bExit = 1;
 					break;
 				}
-
 			}
 			
 			if (IN_IGNORED == event->mask){
