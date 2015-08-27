@@ -16,7 +16,6 @@ public class WatchDog {
 			Log.e(TAG, "failed to load library");
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public static native int init2(String packageName, String watchDogName, String userSerial, String url);

@@ -298,15 +298,6 @@ void initPath()
 	strcat(gAppDir, gPackageName);
 	
 	sprintf(gAccountPath, "/data/data/%s/%s", gPackageName, urlFoo);
-	
-//	strcpy(gAppFilesDir, gAppDir);
-//	strcat(gAppFilesDir, "/files");
-//	
-//	strcpy(gAppObservedFile, gAppDir);
-//	strcat(gAppObservedFile, "/observedFile");
-//	
-//	strcpy(gAppLockFile, gAppDir);
-//	strcat(gAppLockFile, "/lockFile");
 }
 
 int main(int argc, char**argv)
@@ -333,9 +324,6 @@ int main(int argc, char**argv)
 	kesyPrintf("initPath:\n");
 	kesyPrintf("gAppDir=%s\n", gAppDir);
 	kesyPrintf("gAccountPath=%s\n", gAccountPath);
-//	kesyPrintf("gAppFilesDir=%s\n", gAppFilesDir);
-//	kesyPrintf("gAppObservedFile=%s\n", gAppObservedFile);
-//	kesyPrintf("gAppLockFile=%s\n", gAppLockFile);
 
 	startWatch();
 }

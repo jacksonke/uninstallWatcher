@@ -8,16 +8,17 @@
 //#include <fcntl.h>
 #include <sys/stat.h>
 
-// check if watchDog is existent
+// check if watchDog exist
 // return ret:
 // 0 nonexistent
 // 1 existent
 // -1 something wrong when query
+// TODO: to improve
 static int checkSingletonV2(const char* dogName)
 {
 	FILE* stream;
 	
-	/* Opening a read-only channel to ls command. */
+	/* Opening a read-only channel to ps command. */
 	char tmpCmd[256] = "ps ";
 	strcat(tmpCmd, dogName);
 	stream = popen(tmpCmd, "r");
@@ -74,11 +75,16 @@ static int convertJString2LocalString(JNIEnv *env, jstring myJString, char* szLo
 	}
 }
 
-// packageName : the package name who call this jni function
-// watchDogName 这个是监控程序的so文件名。这个判断有没有监控进程存在的依据
-// userSerial 这个参数在弹出网页需要用到，4.2以上的版本用到，4.2的为NULL
-// url 这个参数是卸载程序时，弹出的网页网址
-JNIEXPORT int JNICALL Java_com_bananachip_watcher_WatchDog_init2(JNIEnv *env, jobject obj,
+/*
+ * Class:     com_bananachip_watcher_WatchDog
+ * Method:    init2
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ * packageName : the package name who call this jni function
+ * watchDogName 这个是监控程序的so文件名。这个判断有没有监控进程存在的依据
+ * userSerial 这个参数在弹出网页需要用到，4.2以上的版本用到，4.2的为NULL
+ * url 这个参数是卸载程序时，弹出的网页网址
+ */
+ JNIEXPORT jint JNICALL Java_com_bananachip_watcher_WatchDog_init2(JNIEnv *env, jclass obj,
 	jstring packageName, jstring watchDogName, jstring userSerial, jstring url)
 {
 	char szUrl[NAME_MAX]="\0";
@@ -138,13 +144,14 @@ JNIEXPORT int JNICALL Java_com_bananachip_watcher_WatchDog_init2(JNIEnv *env, jo
 		sprintf(szSoPath, "/data/data/%s/lib/%s", szPackageName, szWatchDogName);
         if (strlen(szSerial) == 0) {
 			execlp(szSoPath, szWatchDogName, "-p", szPackageName, "-u", szUrl, (char *)NULL);
-			exit(1);
         }
         else {
 			execlp(szSoPath, szWatchDogName, "-p", szPackageName, "-s", szSerial, "-u", szUrl, (char *)NULL);
         }
 		
 		kesyPrintf("exec command failed !!! errno=%d\n", errno);
+
+		exit(1);
 
     }
     else
