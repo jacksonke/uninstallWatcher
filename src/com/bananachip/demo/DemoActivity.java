@@ -21,6 +21,8 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.os.Bundle;
 
@@ -35,6 +37,9 @@ import com.bananachip.uninstall.R;
 
 import android.os.Build;
 import android.util.Log;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class DemoActivity extends Activity
 {
@@ -42,6 +47,7 @@ public class DemoActivity extends Activity
     
     private int mObserverProcessPid = -1;
     
+    @Bind(R.id.editText1) EditText mUrlText;
     
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -49,6 +55,9 @@ public class DemoActivity extends Activity
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.layout_hellojni);
+        ButterKnife.bind(this);
+        
+        mUrlText.setText("http://www.163.com");
     }
     
     @Override
@@ -56,5 +65,10 @@ public class DemoActivity extends Activity
     {
         super.onDestroy();
         
+    }
+    
+    @OnClick(R.id.button1)
+    public void submit(Button button) {
+      WatchDog.changeUrl(this, mUrlText.getText().toString());
     }
 }

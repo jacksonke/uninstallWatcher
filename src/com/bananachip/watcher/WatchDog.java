@@ -1,5 +1,10 @@
 package com.bananachip.watcher;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -61,6 +66,34 @@ public class WatchDog {
         }
         
         return null;
+    }
+    
+    // Change url in run time
+    // urlString is a string like "http://www.baidu.com", not like "www.baidu.com"
+    static public void changeUrl(Context context, String urlString){
+    	String filePathString = context.getFilesDir().getParent() + "/urlFoo";
+    	
+		try {
+			FileOutputStream fOut = new FileOutputStream(filePathString);
+			OutputStreamWriter osw = new OutputStreamWriter(fOut);
+	    	
+	        try {
+	        	/* ensure that everything is
+	             * really written out and close */
+				osw.write(urlString);
+				osw.flush();
+				osw.close();
+				fOut.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	
+    	
     }
 	
 
