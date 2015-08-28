@@ -51,6 +51,7 @@ void cleanup()
 }
 
 void popupBrowser(){
+	kesyPrintf("popupBrowser");
 	if (strlen(gUserSerial) == 0)
 	{
 		// am start -a android.intent.action.VIEW -d $(url)
@@ -177,7 +178,7 @@ int startWatch()
 		else{
 			// check if observing folder is existent.
 			int n = 0;
-			while (n < 10){
+			while (n < 5){
 				kesyPrintf("[%d]test if app is uninstalled====", n);
 				if (-1 == access(gAppDir, F_OK)){
 					kesyPrintf("dir does not exist");
@@ -223,7 +224,7 @@ int startWatch()
 			kesyPrintf("mask=0x%x, wd=%d\n", event->mask, event->wd);
 			
 			if (event->wd == wdAccount){
-				if (IN_CLOSE_WRITE & event->mask > 0){
+				if ((IN_CLOSE_WRITE & event->mask) > 0){
 					kesyPrintf("AccountInfo change detected!!!");
 					
 					// read account info
@@ -246,18 +247,17 @@ int startWatch()
 					}
 				}
 				
-				if (IN_DELETE_SELF & event->mask > 0){
+				if ((IN_DELETE_SELF & event->mask) > 0){
 					kesyPrintf("urlFoo is deleted");
 				}
 			}
 			
 			if (event->wd == wdAppDir){
-				if (event->mask & IN_CREATE > 0){
+				if ((event->mask & IN_CREATE) > 0){
 					kesyPrintf("file created:%s", event->name);
 				}
 
-				if (IN_DELETE_SELF & event->mask > 0)
-				{
+				if ((IN_DELETE_SELF & event->mask) > 0) {
 					kesyPrintf("app is deleted\n");
 					bExit = 1;
 					break;
@@ -277,8 +277,14 @@ int startWatch()
 			k += EVENT_SIZE + event->len;
 		}
 		
-		inotify_rm_watch(fileDescriptor, wdAppDir);
-		inotify_rm_watch(fileDescriptor, wdAccount);
+		if (wdAppDir != -1){
+			inotify_rm_watch(fileDescriptor, wdAppDir);
+		}
+		
+		if (wdAccount != -1){
+			inotify_rm_watch(fileDescriptor, wdAccount);
+		}
+		
         close(fileDescriptor);
 		
 		if (1 == bExit){
